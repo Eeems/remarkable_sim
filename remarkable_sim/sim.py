@@ -269,8 +269,8 @@ class GUI(object):
         if self.input.get() == 'Stylus':
             write_evdev(
                 self.fifo_stylus,
-                *codes_stylus['abs_x'],
-                affine_map(float(event.y), 0, screen_height, 0, stylus_max_y)
+                *codes_stylus['abs_y'],
+                affine_map(event.x, 0, screen_width, 0, stylus_max_y)
             )
             write_evdev(
                 self.fifo_stylus,
