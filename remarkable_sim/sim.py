@@ -251,21 +251,7 @@ class GUI(object):
         write_evdev(self.fifo_button, *codes_button[button], 0)
         write_evdev(self.fifo_button, *code_sync)
 
-    # screen initial press
-    def screen_press(self, event):
-        if self.input.get() == 'Stylus':
-            write_evdev(self.fifo_stylus, *codes_stylus['touch'], 1)
-            write_evdev(self.fifo_stylus, *codes_stylus['abs_distance'], 0)
-            write_evdev(self.fifo_stylus, *codes_stylus['abs_pressure'], self.pressure.get())
-            write_evdev(self.fifo_stylus, *codes_stylus['abs_tilt_x'], self.tiltx.get())
-            write_evdev(self.fifo_stylus, *codes_stylus['abs_tilt_y'], self.tilty.get())
-            write_evdev(self.fifo_stylus, *code_sync)
-
-        if self.input.get() == 'Touch':
-            pass
-
-    # screen motion after press
-    def screen_motion(self, event):
+    def emit_screen_coords(self, event):
         if self.input.get() == 'Stylus':
             write_evdev(
                 self.fifo_stylus,
@@ -277,6 +263,30 @@ class GUI(object):
                 *codes_stylus['abs_x'],
                 affine_map(event.y, 0, screen_height, stylus_max_x, 0)
             )
+
+        if self.input.get() == 'Touch':
+            pass
+
+    # screen initial press
+    def screen_press(self, event):
+        if self.input.get() == 'Stylus':
+            write_evdev(self.fifo_stylus, *codes_stylus['toolpen'], 1)
+            write_evdev(self.fifo_stylus, *codes_stylus['touch'], 1)
+            write_evdev(self.fifo_stylus, *codes_stylus['abs_distance'], 0)
+            write_evdev(self.fifo_stylus, *codes_stylus['abs_pressure'], self.pressure.get())
+            write_evdev(self.fifo_stylus, *codes_stylus['abs_tilt_x'], self.tiltx.get())
+            write_evdev(self.fifo_stylus, *codes_stylus['abs_tilt_y'], self.tilty.get())
+            self.emit_screen_coords(event)
+            write_evdev(self.fifo_stylus, *code_sync)
+
+        if self.input.get() == 'Touch':
+            pass
+
+    # screen motion after press
+    def screen_motion(self, event):
+        self.emit_screen_coords(event)
+
+        if self.input.get() == 'Stylus':
             write_evdev(self.fifo_stylus, *code_sync)
 
         if self.input.get() == 'Touch':
@@ -285,9 +295,11 @@ class GUI(object):
     # screen release
     def screen_release(self, event):
         if self.input.get() == 'Stylus':
+            self.emit_screen_coords(event)
             write_evdev(self.fifo_stylus, *codes_stylus['abs_distance'], 100)
             write_evdev(self.fifo_stylus, *codes_stylus['abs_pressure'], 0)
             write_evdev(self.fifo_stylus, *codes_stylus['touch'], 0)
+            write_evdev(self.fifo_stylus, *codes_stylus['toolpen'], 0)
             write_evdev(self.fifo_stylus, *code_sync)
 
         if self.input.get() == 'Touch':
