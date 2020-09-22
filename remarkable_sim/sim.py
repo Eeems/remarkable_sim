@@ -289,8 +289,6 @@ class GUI(object):
             write_evdev(self.fifo_stylus, *codes_stylus['abs_pressure'], 0)
             write_evdev(self.fifo_stylus, *codes_stylus['touch'], 0)
             write_evdev(self.fifo_stylus, *code_sync)
-            write_evdev(self.fifo_stylus, *codes_stylus['touch'], 1)
-            write_evdev(self.fifo_stylus, *codes_stylus['abs_pressure'], 0)
 
         if self.input.get() == 'Touch':
             pass
