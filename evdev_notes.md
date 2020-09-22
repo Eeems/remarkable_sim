@@ -33,7 +33,7 @@ codes resolved with python evdev
   - code [code #] - [name] - [desc] - [range]
   - code 320 - toolpen - -
   - code 321 - toolrubber - -
-  - code 330 - touch - -
+  - code 330 - touch - indicates stylus touching screen or releasing - {0: screen release, 1: screen touch}
   - code 331 - stylus - -
   - code 332 - stylus2 - -
 - type 3 - ev_abs - absolute
