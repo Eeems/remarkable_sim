@@ -14,7 +14,7 @@ from .evsim import (
 )
 
 logging.basicConfig(format='%(message)s')
-log = logging.getLogger(__name__)
+log = logging.getLogger('resim')
 
 # fake evdev interface
 path_fifo_stylus = 'event0'
@@ -318,8 +318,12 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('executable', nargs='?', metavar='PATH', default=None, type=str, help="path to executable")
     parser.add_argument('--display_scale', type=int, default=3, help="scale down rM resolution")
+    parser.add_argument('--debug', action='store_true', help="enable debugging")
 
     args = parser.parse_args()
+
+    if args.debug:
+        log.setLevel('DEBUG')
 
     root = tk.Tk()
     gui = GUI(root, args.display_scale, args.executable)

@@ -2,8 +2,11 @@ import time
 import os
 import struct
 import stat
+import logging
 
-DEBUG = os.environ.get("DEBUG", 0)
+logging.basicConfig(format='%(message)s')
+log = logging.getLogger('resim')
+
 def affine_map(x, a0, a1, b0, b1):
     """Map x in range (a0, a1) to (b0, b1)
     Args:
@@ -45,8 +48,7 @@ def write_evdev(f, e_type, e_code, e_value):
         e_value (int): evdev event value
     """
 
-    if DEBUG:
-        print(f, e_type, e_code, e_value)
+    log.debug("{} {} {} {}".format(f, e_type, e_code, e_value))
 
     t = time.time_ns()
     t_seconds = int(t / 1e9)
