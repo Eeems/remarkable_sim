@@ -178,7 +178,7 @@ class GUI(object):
         self.check2 = tk.IntVar()
         self.check3 = tk.IntVar()
         self.checkpow = tk.IntVar()
-        self.c1 = tk.Checkbutton(self.f2, variable=self.checkpow, text='Button 1')
+        self.c1 = tk.Checkbutton(self.f2, variable=self.check1, text='Button 1')
         self.c1.grid(row=0, column=4, sticky='w')
         self.c2 = tk.Checkbutton(self.f2, variable=self.check2, text='Button 2')
         self.c2.grid(row=0, column=5, sticky='w')
