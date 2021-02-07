@@ -39,8 +39,8 @@ class GUI(object):
     def __init__(self, root, display_scale, executable):
 
         self.display_scale = display_scale
-        self.screen_width = 1404 // self.display_scale
-        self.screen_height = 4 * self.screen_width // 3
+        self.screen_width = int(1404 // self.display_scale)
+        self.screen_height = int(4 * self.screen_width // 3)
 
         self.root = root
         root.title("reMarkable simulator")
@@ -53,7 +53,7 @@ class GUI(object):
             height=1.7 * self.screen_width,
             background='white'
         )
-        self.f1.grid(row=0, column=0)
+        self.f1.grid(row=1, column=1)
         self.tablet = tk.Canvas(
             self.f1,
             width=1.1278 * self.screen_width,
@@ -152,20 +152,20 @@ class GUI(object):
         tk.Label(self.f2, text='Input Method').grid(row=0, column=0)
         tk.OptionMenu(self.f2, self.input, 'Stylus', 'Touch').grid(row=0, column=1)
 
-        tk.Label(self.f2, text='Stylus Pressure').grid(row=1, column=0)
-        self.pressure = tk.Scale(self.f2, from_=0, to=4095, orient='horizontal')
-        self.pressure.set(4000)
-        self.pressure.grid(row=1, column=1)
-        tk.Label(self.f2, text='Stylus Tilt X').grid(row=2, column=0)
-        self.tiltx = tk.Scale(self.f2, from_=-6300, to=6300, orient='horizontal')
-        self.tiltx.grid(row=2, column=1)
-        self.tiltx.set(1000)
-        tk.Label(self.f2, text='Stylus Tilt Y').grid(row=3, column=0)
-        self.tilty = tk.Scale(self.f2, from_=-6300, to=6300, orient='horizontal')
-        self.tilty.set(1000)
-        self.tilty.grid(row=3, column=1)
-
-        ttk.Separator(self.f2, orient='vertical').grid(row=0, column=2, rowspan=3, sticky='ns')
+#        tk.Label(self.f2, text='Stylus Pressure').grid(row=1, column=0)
+#        self.pressure = tk.Scale(self.f2, from_=0, to=4095, orient='horizontal')
+#        self.pressure.set(4000)
+#        self.pressure.grid(row=1, column=1)
+#        tk.Label(self.f2, text='Stylus Tilt X').grid(row=2, column=0)
+#        self.tiltx = tk.Scale(self.f2, from_=-6300, to=6300, orient='horizontal')
+#        self.tiltx.grid(row=2, column=1)
+#        self.tiltx.set(1000)
+#        tk.Label(self.f2, text='Stylus Tilt Y').grid(row=3, column=0)
+#        self.tilty = tk.Scale(self.f2, from_=-6300, to=6300, orient='horizontal')
+#        self.tilty.set(1000)
+#        self.tilty.grid(row=3, column=1)
+#
+#        ttk.Separator(self.f2, orient='vertical').grid(row=0, column=2, rowspan=3, sticky='ns')
 
         # Checkboxes
 
@@ -178,19 +178,19 @@ class GUI(object):
         self.check2 = tk.IntVar()
         self.check3 = tk.IntVar()
         self.checkpow = tk.IntVar()
-        self.c1 = tk.Checkbutton(self.f2, variable=self.check1, text='Button 1')
-        self.c1.grid(row=0, column=4, sticky='w')
-        self.c2 = tk.Checkbutton(self.f2, variable=self.check2, text='Button 2')
-        self.c2.grid(row=0, column=5, sticky='w')
-        self.c3 = tk.Checkbutton(self.f2, variable=self.check3, text='Button 3')
-        self.c3.grid(row=0, column=6, sticky='w')
-        self.cpow = tk.Checkbutton(self.f2, variable=self.checkpow, text='Power')
-        self.cpow.grid(row=1, column=4, sticky='w')
+#        self.c1 = tk.Checkbutton(self.f2, variable=self.check1, text='Button 1')
+#        self.c1.grid(row=0, column=4, sticky='w')
+#        self.c2 = tk.Checkbutton(self.f2, variable=self.check2, text='Button 2')
+#        self.c2.grid(row=0, column=5, sticky='w')
+#        self.c3 = tk.Checkbutton(self.f2, variable=self.check3, text='Button 3')
+#        self.c3.grid(row=0, column=6, sticky='w')
+#        self.cpow = tk.Checkbutton(self.f2, variable=self.checkpow, text='Power')
+#        self.cpow.grid(row=1, column=4, sticky='w')
 
-        self.hold = tk.Button(self.f2, text='Multi Press')
-        self.hold.grid(row=2, column=5)
-        self.hold.bind('<ButtonPress>', self.multi_press)
-        self.hold.bind('<ButtonRelease>', self.multi_release)
+#        self.hold = tk.Button(self.f2, text='Multi Press')
+#        self.hold.grid(row=2, column=5)
+#        self.hold.bind('<ButtonPress>', self.multi_press)
+#        self.hold.bind('<ButtonRelease>', self.multi_release)
 
         self.root.after(screen_update_delay, self.load_screen)
 
@@ -209,15 +209,18 @@ class GUI(object):
 
     def load_screen(self):
         # FIXME: file is sometimes read before writing is finished
+        from PIL import Image, ImageTk
         if os.path.exists(path_fb):
             try:
-                img = tk.PhotoImage(file=path_fb)
+                img = Image.open(path_fb)
             except tk.TclError:
                 return
             except KeyboardInterrupt:
                 sys.exit(0)
 
-            self.img_scaled = img.subsample(self.display_scale, self.display_scale)
+            self.img_scaled = ImageTk.PhotoImage(
+                img.resize((self.screen_width, self.screen_height)))
+
             self.screen.create_image(0, 0, image=self.img_scaled, anchor='nw')
             self.root.after(screen_update_delay, self.load_screen)
         else:
@@ -281,9 +284,9 @@ class GUI(object):
             write_evdev(self.fifo_stylus, *codes_stylus['toolpen'], 1)
             write_evdev(self.fifo_stylus, *codes_stylus['touch'], 1)
             write_evdev(self.fifo_stylus, *codes_stylus['abs_distance'], 0)
-            write_evdev(self.fifo_stylus, *codes_stylus['abs_pressure'], self.pressure.get())
-            write_evdev(self.fifo_stylus, *codes_stylus['abs_tilt_x'], self.tiltx.get())
-            write_evdev(self.fifo_stylus, *codes_stylus['abs_tilt_y'], self.tilty.get())
+            write_evdev(self.fifo_stylus, *codes_stylus['abs_pressure'], 4000) # self.pressure.get())
+            write_evdev(self.fifo_stylus, *codes_stylus['abs_tilt_x'], 1000) # self.tiltx.get())
+            write_evdev(self.fifo_stylus, *codes_stylus['abs_tilt_y'], 1000) # self.tilty.get())
             write_evdev(self.fifo_stylus, *code_sync)
 
         if self.input.get() == 'Touch':
@@ -317,7 +320,7 @@ class GUI(object):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('executable', nargs='?', metavar='PATH', default=None, type=str, help="path to executable")
-    parser.add_argument('--display_scale', type=int, default=3, help="scale down rM resolution")
+    parser.add_argument('--display_scale', '-ds', type=float, default=3, help="scale down rM resolution")
     parser.add_argument('--debug', action='store_true', help="enable debugging")
 
     args = parser.parse_args()
@@ -326,6 +329,11 @@ def main():
         log.setLevel('DEBUG')
 
     root = tk.Tk()
+    root.rowconfigure(0, weight=1)
+    root.columnconfigure(0, weight=1)
+    root.rowconfigure(2, weight=1)
+    root.columnconfigure(2, weight=1)
+
     gui = GUI(root, args.display_scale, args.executable)
 
     try:

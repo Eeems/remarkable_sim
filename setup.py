@@ -21,5 +21,9 @@ setup(
     },
     classifiers=[
         "Programming Language :: Python :: 3",
+    ],
+    install_requires=[
+        "tkinter",
+        "pillow"
     ]
 )
