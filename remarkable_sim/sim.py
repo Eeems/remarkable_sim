@@ -223,6 +223,8 @@ class GUI(object):
         else:
             print(path_fb + " not found")
 
+        self.poll_executable()
+
     # ----- Event Callbacks -----
 
     # handle multi button press
@@ -313,6 +315,11 @@ class GUI(object):
         if self.input.get() == 'Touch':
             pass
 
+    def poll_executable(self):
+        if self.subprocess is None or self.subprocess.poll() is None:
+            return
+
+        sys.exit(0)
 
 def main():
     parser = argparse.ArgumentParser()
