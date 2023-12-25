@@ -201,8 +201,7 @@ class GUI(object):
         self.fifo_button = makefifo(path_fifo_button)
 
         if executable is not None:
-            # prepend exec so that executable inherits shell process and can be killed
-            self.subprocess = subprocess.Popen('exec ' + executable, shell=True)
+            self.subprocess = subprocess.Popen(executable)
         else:
             self.subprocess = None
 
@@ -331,6 +330,7 @@ def main():
 
     if gui.subprocess is not None:
         gui.subprocess.terminate()
+        gui.subprocess.wait()
     os.remove(path_fifo_stylus)
     os.remove(path_fifo_touch)
     os.remove(path_fifo_button)
